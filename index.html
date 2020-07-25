@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>371班级分布</title>
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/china.js"></script>
+</head>
+
+<body>
+    <h1 style="text-align: center; margin: auto;">371班级地图</h1>
+    <div id="container" style="height: 890px;width:1300px;background:white;margin:auto;"></div>
+
+    <script type="text/javascript">
+        // 全国省份列表
+        var dataMap = [{
+                name: '北京'
+            }, {
+                name: '天津'
+            }, {
+                name: '上海'
+            }, {
+                name: '重庆'
+            }, {
+                name: '河北'
+            }, {
+                name: '河南'
+            }, {
+                name: '云南'
+            }, {
+                name: '辽宁'
+            }, {
+                name: '黑龙江'
+            }, {
+                name: '湖南'
+            }, {
+                name: '安徽'
+            }, {
+                name: '山东'
+            }, {
+                name: '新疆'
+            }, {
+                name: '江苏'
+            }, {
+                name: '浙江'
+            }, {
+                name: '江西'
+            }, {
+                name: '湖北'
+            }, {
+                name: '广西'
+            }, {
+                name: '甘肃'
+            }, {
+                name: '山西'
+            }, {
+                name: '内蒙古'
+            }, {
+                name: '陕西'
+            }, {
+                name: '吉林'
+            }, {
+                name: '福建'
+            }, {
+                name: '贵州'
+            }, {
+                name: '广东'
+            }, {
+                name: '青海'
+            }, {
+                name: '西藏'
+            }, {
+                name: '四川'
+            }, {
+                name: '宁夏'
+            }, {
+                name: '海南'
+            }, {
+                name: '台湾'
+            }, {
+                name: '香港'
+            }, {
+                name: '澳门'
+            }]
+            // 需要在页面上直接标记出来的城市
+        var specialMap = ['湖南', '浙江', '云南', '湖北', '江苏', '四川', '辽宁', '江西', '北京', '天津', '黑龙江', '福建', '上海', '贵州', '重庆', "河北"];
+        // 对dataMap进行处理，使其可以直接在页面上展示
+        for (var i = 0; i < specialMap.length; i++) {
+            for (var j = 0; j < dataMap.length; j++) {
+                if (specialMap[i] == dataMap[j].name) {
+                    dataMap[j].selected = true;
+                    break;
+                }
+
+            }
+        }
+        var people = [{
+            province: "云南",
+            city: "昆明:云南大学 肖峰"
+        }, {
+            province: "贵州",
+            city: "贵阳:贵州大学 周友发"
+        }, {
+            province: "上海",
+            city: "上海: 复旦大学 李子晨"
+        }, {
+            province: "湖南",
+            city: "长沙: 湖南师范大学 刘冬花 杨元庆 <br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp长沙理工大学 邓小文 谭淑琪 罗丰<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp中南林业科技大学 曾子恒 许洪 <br>衡阳: 南华大学 唐贝康 艾雯雯 杨杰暾 杨济丞<br>湘潭: 湖南科技大学 沈良翰 <br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp湘潭大学 郭瀚文 曾钰淇<br>"
+        }, {
+            province: "北京",
+            city: "北京: 清华大学 周康林<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp北京航空航天大学 胡洪"
+        }, {
+            province: "天津",
+            city: "天津: 天津大学 汪慧洁"
+        }, {
+            province: "黑龙江",
+            city: "哈尔滨: 哈尔滨工程大学 龙平江"
+        }, {
+            province: '湖北',
+            city: "武汉: 华中科技大学 吴子曦 张权<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 武汉大学 补耀华 邱逸群 袁道辉"
+        }, {
+            province: "江苏",
+            city: "南京: 南京大学 刘杨<br>苏州: 苏州大学 杨晋<br>徐州: 中国矿业大学 贾京陈 张建国<br>扬州: 扬州大学 杨颖芝"
+        }, {
+            province: "辽宁",
+            city: "大连: 大连理工大学 夏铭泽 陈欣然<br>长春: 长春理工大学 李欣怡"
+        }, {
+            province: "浙江",
+            city: "杭州: 浙江大学 李思怡<br>宁波: 宁波大学 杨青萍"
+        }, {
+            province: "河北",
+            city: "秦皇岛: 东北大学秦皇岛分校 杨东雳"
+        }, {
+            province: "江西",
+            city: "南昌: 陆军步兵学院 张鸿鑫"
+        }, {
+            province: "福建",
+            city: "厦门: 华侨大学 成肖湘<br>福州: 福建农林大学 杨俊杰"
+        }, {
+            province: "重庆",
+            city: "重庆: 重庆交通大学 杨青"
+        }];
+        // 绘制图表，准备数据
+        var option = {
+            tooltip: {
+                formatter: function(params) {
+                    var info = '<p style="font-size:18px">' + params.name + '</p><p style="font-size:14px">'
+                    people.forEach(function(value) {
+                        if (value.province == params.name) {
+                            info = info + value.city + '</p>';
+                        }
+                    })
+                    return info;
+                },
+                backgroundColor: "#ff7f50", //提示标签背景颜色
+                textStyle: {
+                    color: "#fff"
+                } //提示标签字体颜色
+            },
+            series: [{
+                name: '中国',
+                type: 'map',
+                mapType: 'china',
+                label: {
+                    normal: {
+                        show: true, //显示省份标签
+                        // textStyle:{color:"#c71585"}//省份标签字体颜色
+                    },
+                    emphasis: {
+                        show: true, //对应的鼠标悬浮效果
+                        // textStyle:{color:"#800080"}
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        borderWidth: .5, //区域边框宽度
+                        // borderColor: '#009fe8',//区域边框颜色
+                        // areaColor:"#ffefd5",//区域颜色
+                    },
+                    emphasis: {
+                        borderWidth: .5,
+                        borderColor: '#4b0082',
+                        areaColor: "#ffdead",
+                    }
+                },
+                data: dataMap
+            }]
+        };
+        //初始化echarts实例
+        var myChart = echarts.init(document.getElementById('container'));
+        //使用制定的配置项和数据显示图表
+        myChart.setOption(option);
+    </script>
+
+
+</body>
+
+</html>
